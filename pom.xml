@@ -46,6 +46,7 @@
         <module>network</module>
         <module>seednode</module>
         <module>gui</module>
+        <module>testbed</module>
     </modules>
 
     <build>
