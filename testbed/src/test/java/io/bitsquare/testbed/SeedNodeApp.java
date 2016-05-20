@@ -10,7 +10,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.Instant;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.Executors;
@@ -26,12 +25,7 @@ import java.util.concurrent.ThreadFactory;
  * a {@code HOSTNAME[:PORT]} address to listen on.
  * Otherwise an automatic local host address will be chosen for you.
  */
-public class SeedNodeApp {
-    /** Name of directory under the current one to place data files into. */
-    private static final String dataDirName = "testbed-data";
-    /** Numeric identifier of the regtest Bitcoin network. */
-    private static final int REGTEST_NETWORK_ID = 2;
-
+public class SeedNodeApp extends TestbedNodeApp {
     public static void main(String[] args) {
         // Get address from the command line and set as the only seed node.
         final NodeAddress seedAddr = newSeedNodeAddress((args.length > 0) ? args[0] : null);
@@ -129,23 +123,5 @@ public class SeedNodeApp {
         }
 
         return new NodeAddress(hostName, port);
-    }
-
-    /** Print a timestamped testbed log entry to standard output.
-     *
-     * You can select these lines with a command like
-     * {@code egrep '^(ESC\[[0-9;m]+)?TB '}
-     * where {@code ESC} is the actual escape character (e.g Ctrl-V Esc in Bash).
-     * The reason for such complex regular expression (instead of just {@code '^TB '})
-     * is that loggers may colorize output
-     * regardless of whether it is being sent to a pipe.
-     */
-    private static void testLog(String format, Object... args) {
-        System.out.println(
-                String.format("TB %s %s",
-                        Instant.now().toString(),
-                        String.format(format, args)
-                )
-        );
     }
 }

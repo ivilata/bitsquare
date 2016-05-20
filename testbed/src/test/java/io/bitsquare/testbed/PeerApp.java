@@ -16,7 +16,6 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import java.io.File;
 import java.nio.file.Paths;
 import java.security.Security;
-import java.time.Instant;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.Executors;
@@ -31,12 +30,7 @@ import java.util.concurrent.ThreadFactory;
  * You must provide an argument with
  * the {@code HOSTNAME:PORT} address of the seed node.
  */
-public class PeerApp {
-    /** Name of directory under the current one to place data files into. */
-    private static final String dataDirName = "testbed-data";
-    /** Numeric identifier of the regtest Bitcoin network. */
-    private static final int REGTEST_NETWORK_ID = 2;
-
+public class PeerApp extends TestbedNodeApp {
     public static void main(String[] args) {
         // Build a seed node repository containing only the one given as an argument.
         if (args.length < 1) {
@@ -126,14 +120,5 @@ public class PeerApp {
             peer.start(peerListener);
         });
         // Automatically wait for the non-daemon user thread.
-    }
-
-    private static void testLog(String format, Object... args) {
-        System.out.println(
-                String.format("TB %s %s",
-                        Instant.now().toString(),
-                        String.format(format, args)
-                )
-        );
     }
 }
