@@ -27,6 +27,7 @@ public class SeedNodeApp {
         final Set<NodeAddress> allSeedAddrs = new HashSet<>(1);
         allSeedAddrs.add(seedAddr);
 
+        // Create a single seed node with a listener to log interesting events.
         final Path dataDir = Paths.get(System.getProperty("user.dir"), dataDirName);
         final SeedNode seedNode = new SeedNode(dataDir.toString());
         final P2PServiceListener seedNodeListener = new P2PServiceListener() {
