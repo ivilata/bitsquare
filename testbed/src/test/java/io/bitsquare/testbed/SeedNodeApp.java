@@ -27,6 +27,7 @@ import java.util.concurrent.ThreadFactory;
  * Otherwise an automatic local host address will be chosen for you.
  */
 public class SeedNodeApp {
+    /** Name of directory under the current one to place data files into. */
     private static final String dataDirName = "testbed-data";
     /** Numeric identifier of the regtest Bitcoin network. */
     private static final int REGTEST_NETWORK_ID = 2;
