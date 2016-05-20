@@ -1,5 +1,7 @@
 package io.bitsquare.testbed;
 
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import io.bitsquare.common.UserThread;
 import io.bitsquare.p2p.NodeAddress;
 import io.bitsquare.p2p.Utils;
 import io.bitsquare.p2p.seed.SeedNode;
@@ -9,6 +11,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
 
 public class SeedNodeApp {
     private static final String dataDirName = "testbed-data";
@@ -22,14 +26,23 @@ public class SeedNodeApp {
         allSeedAddrs.add(seedAddr);
 
         final Path dataDir = Paths.get(System.getProperty("user.dir"), dataDirName);
+        final SeedNode seedNode = new SeedNode(dataDir.toString());
 
         // TODO: Check if setting a security provider is needed.
-        // TODO: Setup an executor and wait.
 
-        SeedNode seedNode = new SeedNode(dataDir.toString());
-        seedNode.createAndStartP2PService(seedAddr, SeedNode.MAX_CONNECTIONS_DEFAULT,
+        // Set the user thread as an independent non-daemon thread,
+        // and give it a name and a exception handler to print errors.
+        final ThreadFactory threadFactory = new ThreadFactoryBuilder()
+                .setNameFormat("SeedNode")
+                .setUncaughtExceptionHandler((thread, throwable) -> throwable.printStackTrace())
+                .build();
+        UserThread.setExecutor(Executors.newSingleThreadExecutor(threadFactory));
+        // Run seed node code in the user thread.
+        UserThread.execute(() -> seedNode.createAndStartP2PService(
+                seedAddr, SeedNode.MAX_CONNECTIONS_DEFAULT,
                 seedAddr.hostName.equals("localhost"), REGTEST_NETWORK_ID,
-                false /*detailed logging*/, allSeedAddrs, null /*TODO: listener*/);
+                false /*detailed logging*/, allSeedAddrs, null /*TODO: listener*/));
+        // Automatically wait for the non-daemon user thread.
     }
 
     /** Get a seed node address based on the given string address.
