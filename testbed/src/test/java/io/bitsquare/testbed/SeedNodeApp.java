@@ -9,6 +9,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.Instant;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.Executors;
@@ -34,7 +35,10 @@ public class SeedNodeApp {
         // and give it a name and a exception handler to print errors.
         final ThreadFactory threadFactory = new ThreadFactoryBuilder()
                 .setNameFormat("SeedNode")
-                .setUncaughtExceptionHandler((thread, throwable) -> throwable.printStackTrace())
+                .setUncaughtExceptionHandler((thread, throwable) -> {
+                    throwable.printStackTrace();
+                    testLog("EXC %s: %s", throwable.getClass().getSimpleName(), throwable.getMessage());
+                })
                 .build();
         UserThread.setExecutor(Executors.newSingleThreadExecutor(threadFactory));
         // Run seed node code in the user thread.
@@ -72,5 +76,15 @@ public class SeedNodeApp {
         }
 
         return new NodeAddress(hostName, port);
+    }
+
+    /** Print a timestamped testbed log entry to standard output. */
+    private static void testLog(String format, Object... args) {
+        System.out.println(
+                String.format("TB %s %s",
+                        Instant.now().toString(),
+                        String.format(format, args)
+                )
+        );
     }
 }
