@@ -22,6 +22,15 @@ import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 
+/**
+ * Peer application for testbed experiments.
+ *
+ * You may run this class to create a peer on the regression test network
+ * which can contact other testbed peers with the help of a seed node.
+ *
+ * You must provide an argument with
+ * the {@code HOSTNAME:PORT} address of the seed node.
+ */
 public class PeerApp {
     /** Name of directory under the current one to place data files into. */
     private static final String dataDirName = "testbed-data";
