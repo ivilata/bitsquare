@@ -16,6 +16,16 @@ import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 
+/**
+ * Single seed node application for testbed experiments.
+ *
+ * You may run this class to create a seed node on the regression test network
+ * which can be used by testbed peers to contact others.
+ *
+ * You may provide an optional argument with
+ * a {@code HOST_NAME[:PORT]} address to listen on.
+ * Otherwise an automatic local host address will be chosen for you.
+ */
 public class SeedNodeApp {
     private static final String dataDirName = "testbed-data";
     /** Numeric identifier of the regtest Bitcoin network. */
