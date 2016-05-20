@@ -37,6 +37,7 @@ public class SeedNodeApp {
         final NodeAddress seedAddr = newSeedNodeAddress((args.length > 0) ? args[0] : null);
         final Set<NodeAddress> allSeedAddrs = new HashSet<>(1);
         allSeedAddrs.add(seedAddr);
+        testLog("ADDRESS %s", seedAddr);
 
         // Create a single seed node with a listener to log interesting events.
         final Path dataDir = Paths.get(System.getProperty("user.dir"), dataDirName);
