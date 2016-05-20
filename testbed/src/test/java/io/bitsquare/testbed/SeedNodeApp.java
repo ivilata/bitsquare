@@ -123,7 +123,8 @@ public class SeedNodeApp {
      * You can select these lines with a command like
      * {@code egrep '^(ESC\[[0-9;m]+)?TB '}
      * where {@code ESC} is the actual escape character (e.g Ctrl-V Esc in Bash).
-     * The reason for such complex command is that loggers may colorize output
+     * The reason for such complex regular expression (instead of just {@code '^TB '})
+     * is that loggers may colorize output
      * regardless of whether it is being sent to a pipe.
      */
     private static void testLog(String format, Object... args) {
