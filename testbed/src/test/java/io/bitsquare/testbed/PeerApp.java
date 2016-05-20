@@ -8,7 +8,6 @@ import io.bitsquare.common.crypto.KeyStorage;
 import io.bitsquare.crypto.EncryptionService;
 import io.bitsquare.p2p.NodeAddress;
 import io.bitsquare.p2p.P2PService;
-import io.bitsquare.p2p.P2PServiceListener;
 import io.bitsquare.p2p.Utils;
 import io.bitsquare.p2p.seed.SeedNodesRepository;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
@@ -64,45 +63,9 @@ public class PeerApp extends TestbedNodeApp {
         final KeyRing peerKeyRing = new KeyRing(peerKeyStorage);
         final EncryptionService peerEncryptionService = new EncryptionService(peerKeyRing);
 
-        // Create a peer with a listener to log interesting events.
+        // Create a new peer.
         final P2PService peer = new P2PService(allSeedNodes, peerPort, peerTorDir, useLocalhost,
                 REGTEST_NETWORK_ID, peerStorageDir, new Clock(), peerEncryptionService, peerKeyRing);
-        final P2PServiceListener peerListener = new P2PServiceListener() {
-            @Override
-            public void onRequestingDataCompleted() {
-                testLog("DATA_RECEIVED");
-            }
-
-            @Override
-            public void onNoSeedNodeAvailable() {
-                testLog("NO_SEED_NODE");
-            }
-
-            @Override
-            public void onNoPeersAvailable() {
-                testLog("NO_PEERS");
-            }
-
-            @Override
-            public void onBootstrapComplete() {
-                testLog("BOOTSTRAPPED");
-            }
-
-            @Override
-            public void onTorNodeReady() {
-                testLog("TOR_READY");
-            }
-
-            @Override
-            public void onHiddenServicePublished() {
-                testLog("PUBLISHED");
-            }
-
-            @Override
-            public void onSetupFailed(Throwable throwable) {
-                testLog("SETUP_FAILED");
-            }
-        };
 
         // Set the user thread as an independent non-daemon thread,
         // and give it a name and a exception handler to print errors.
@@ -117,7 +80,7 @@ public class PeerApp extends TestbedNodeApp {
         // Run peer code in the user thread.
         UserThread.execute(() -> {
             testLog("START");
-            peer.start(peerListener);
+            peer.start(new TestbedListener());
         });
         // Automatically wait for the non-daemon user thread.
     }

@@ -1,5 +1,7 @@
 package io.bitsquare.testbed;
 
+import io.bitsquare.p2p.P2PServiceListener;
+
 import java.time.Instant;
 
 abstract class TestbedNodeApp {
@@ -24,5 +26,43 @@ abstract class TestbedNodeApp {
                         String.format(format, args)
                 )
         );
+    }
+}
+
+/** A P2P service listener that logs interesting events. */
+class TestbedListener implements P2PServiceListener {
+    @Override
+    public void onRequestingDataCompleted() {
+        TestbedNodeApp.testLog("DATA_RECEIVED");
+    }
+
+    @Override
+    public void onNoSeedNodeAvailable() {
+        TestbedNodeApp.testLog("NO_SEED_NODE");
+    }
+
+    @Override
+    public void onNoPeersAvailable() {
+        TestbedNodeApp.testLog("NO_PEERS");
+    }
+
+    @Override
+    public void onBootstrapComplete() {
+        TestbedNodeApp.testLog("BOOTSTRAPPED");
+    }
+
+    @Override
+    public void onTorNodeReady() {
+        TestbedNodeApp.testLog("TOR_READY");
+    }
+
+    @Override
+    public void onHiddenServicePublished() {
+        TestbedNodeApp.testLog("PUBLISHED");
+    }
+
+    @Override
+    public void onSetupFailed(Throwable throwable) {
+        TestbedNodeApp.testLog("SETUP_FAILED");
     }
 }

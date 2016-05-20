@@ -3,7 +3,6 @@ package io.bitsquare.testbed;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import io.bitsquare.common.UserThread;
 import io.bitsquare.p2p.NodeAddress;
-import io.bitsquare.p2p.P2PServiceListener;
 import io.bitsquare.p2p.Utils;
 import io.bitsquare.p2p.seed.SeedNode;
 import org.jetbrains.annotations.Nullable;
@@ -33,45 +32,9 @@ public class SeedNodeApp extends TestbedNodeApp {
         allSeedAddrs.add(seedAddr);
         testLog("ADDRESS %s", seedAddr);
 
-        // Create a single seed node with a listener to log interesting events.
+        // Create a single seed node.
         final Path dataDir = Paths.get(System.getProperty("user.dir"), dataDirName);
         final SeedNode seedNode = new SeedNode(dataDir.toString());
-        final P2PServiceListener seedNodeListener = new P2PServiceListener() {
-            @Override
-            public void onRequestingDataCompleted() {
-                // preliminary data not used in single seed node
-            }
-
-            @Override
-            public void onNoSeedNodeAvailable() {
-                // expected in single seed node
-            }
-
-            @Override
-            public void onNoPeersAvailable() {
-                // expected in single seed node
-            }
-
-            @Override
-            public void onBootstrapComplete() {
-                // not used in single seed node
-            }
-
-            @Override
-            public void onTorNodeReady() {
-                testLog("TOR_READY");
-            }
-
-            @Override
-            public void onHiddenServicePublished() {
-                testLog("PUBLISHED");
-            }
-
-            @Override
-            public void onSetupFailed(Throwable throwable) {
-                testLog("SETUP_FAILED");
-            }
-        };
 
         // TODO: Check if setting a security provider is needed.
 
@@ -91,7 +54,7 @@ public class SeedNodeApp extends TestbedNodeApp {
             seedNode.createAndStartP2PService(
                     seedAddr, SeedNode.MAX_CONNECTIONS_DEFAULT,
                     seedAddr.hostName.equals("localhost"), REGTEST_NETWORK_ID,
-                    false /*detailed logging*/, allSeedAddrs, seedNodeListener);
+                    false /*detailed logging*/, allSeedAddrs, new TestbedListener());
         });
         // Automatically wait for the non-daemon user thread.
     }
