@@ -23,7 +23,7 @@ import java.util.concurrent.ThreadFactory;
  * which can be used by testbed peers to contact others.
  *
  * You may provide an optional argument with
- * a {@code HOST_NAME[:PORT]} address to listen on.
+ * a {@code HOSTNAME[:PORT]} address to listen on.
  * Otherwise an automatic local host address will be chosen for you.
  */
 public class SeedNodeApp {
