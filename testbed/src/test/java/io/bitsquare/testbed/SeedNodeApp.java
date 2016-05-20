@@ -3,6 +3,7 @@ package io.bitsquare.testbed;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import io.bitsquare.common.UserThread;
 import io.bitsquare.p2p.NodeAddress;
+import io.bitsquare.p2p.P2PServiceListener;
 import io.bitsquare.p2p.Utils;
 import io.bitsquare.p2p.seed.SeedNode;
 import org.jetbrains.annotations.Nullable;
@@ -28,6 +29,42 @@ public class SeedNodeApp {
 
         final Path dataDir = Paths.get(System.getProperty("user.dir"), dataDirName);
         final SeedNode seedNode = new SeedNode(dataDir.toString());
+        final P2PServiceListener seedNodeListener = new P2PServiceListener() {
+            @Override
+            public void onRequestingDataCompleted() {
+                // preliminary data not used in single seed node
+            }
+
+            @Override
+            public void onNoSeedNodeAvailable() {
+                // expected in single seed node
+            }
+
+            @Override
+            public void onNoPeersAvailable() {
+                // expected in single seed node
+            }
+
+            @Override
+            public void onBootstrapComplete() {
+                // not used in single seed node
+            }
+
+            @Override
+            public void onTorNodeReady() {
+                testLog("TOR_READY");
+            }
+
+            @Override
+            public void onHiddenServicePublished() {
+                testLog("PUBLISHED");
+            }
+
+            @Override
+            public void onSetupFailed(Throwable throwable) {
+                testLog("SETUP_FAILED");
+            }
+        };
 
         // TODO: Check if setting a security provider is needed.
 
@@ -42,10 +79,13 @@ public class SeedNodeApp {
                 .build();
         UserThread.setExecutor(Executors.newSingleThreadExecutor(threadFactory));
         // Run seed node code in the user thread.
-        UserThread.execute(() -> seedNode.createAndStartP2PService(
-                seedAddr, SeedNode.MAX_CONNECTIONS_DEFAULT,
-                seedAddr.hostName.equals("localhost"), REGTEST_NETWORK_ID,
-                false /*detailed logging*/, allSeedAddrs, null /*TODO: listener*/));
+        UserThread.execute(() -> {
+            testLog("START");
+            seedNode.createAndStartP2PService(
+                    seedAddr, SeedNode.MAX_CONNECTIONS_DEFAULT,
+                    seedAddr.hostName.equals("localhost"), REGTEST_NETWORK_ID,
+                    false /*detailed logging*/, allSeedAddrs, seedNodeListener);
+        });
         // Automatically wait for the non-daemon user thread.
     }
 
