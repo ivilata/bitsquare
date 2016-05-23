@@ -1,6 +1,5 @@
 package io.bitsquare.testbed;
 
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import io.bitsquare.common.UserThread;
 import io.bitsquare.p2p.NodeAddress;
 import io.bitsquare.p2p.Utils;
@@ -11,8 +10,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadFactory;
 
 /**
  * Single seed node application for testbed experiments.
@@ -36,16 +33,7 @@ public class SeedNodeApp extends TestbedNodeApp implements Runnable {
 
         // TODO: Check if setting a security provider is needed.
 
-        // Set the user thread as an independent non-daemon thread,
-        // and give it a name and a exception handler to print errors.
-        final ThreadFactory threadFactory = new ThreadFactoryBuilder()
-                .setNameFormat("SeedNode")
-                .setUncaughtExceptionHandler((thread, throwable) -> {
-                    throwable.printStackTrace();
-                    testLog("EXC %s: %s", throwable.getClass().getSimpleName(), throwable.getMessage());
-                })
-                .build();
-        UserThread.setExecutor(Executors.newSingleThreadExecutor(threadFactory));
+        initEnvironment("SeedNode");
         app.run();
     }
 

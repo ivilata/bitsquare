@@ -1,6 +1,5 @@
 package io.bitsquare.testbed;
 
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import io.bitsquare.common.Clock;
 import io.bitsquare.common.UserThread;
 import io.bitsquare.common.crypto.KeyRing;
@@ -17,8 +16,6 @@ import java.nio.file.Paths;
 import java.security.Security;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadFactory;
 
 /**
  * Peer application for testbed experiments.
@@ -41,16 +38,7 @@ public class PeerApp extends TestbedNodeApp {
         // Set a security provider to allow key generation.
         Security.addProvider(new BouncyCastleProvider());
 
-        // Set the user thread as an independent non-daemon thread,
-        // and give it a name and a exception handler to print errors.
-        final ThreadFactory threadFactory = new ThreadFactoryBuilder()
-                .setNameFormat("Peer")
-                .setUncaughtExceptionHandler((thread, throwable) -> {
-                    throwable.printStackTrace();
-                    testLog("EXC %s: %s", throwable.getClass().getSimpleName(), throwable.getMessage());
-                })
-                .build();
-        UserThread.setExecutor(Executors.newSingleThreadExecutor(threadFactory));
+        initEnvironment("Peer");
         new PeerApp(seedAddr);
     }
 
