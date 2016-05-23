@@ -26,6 +26,10 @@ import java.util.concurrent.TimeUnit;
  * Otherwise an automatic local host address will be chosen for you.
  */
 public class SeedNodeApp extends TestbedNodeApp implements Runnable {
+    /** Create and run a seed node on the given address.
+     *
+     * Data is stored in a directory under the current one.
+     */
     public static void main(String[] args) {
         final NodeAddress seedAddr = newSeedNodeAddress((args.length > 0) ? args[0] : null);
         final Path dataDir = Paths.get(System.getProperty("user.dir"), dataDirName);
