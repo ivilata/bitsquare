@@ -13,6 +13,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Single seed node application for testbed experiments.
@@ -26,14 +27,18 @@ import java.util.concurrent.ThreadFactory;
  */
 public class SeedNodeApp extends TestbedNodeApp {
     public static void main(String[] args) {
-        // Get address from the command line and set as the only seed node.
         final NodeAddress seedAddr = newSeedNodeAddress((args.length > 0) ? args[0] : null);
+        final Path dataDir = Paths.get(System.getProperty("user.dir"), dataDirName);
+        new SeedNodeApp(seedAddr, dataDir);
+    }
+
+    private SeedNodeApp(NodeAddress seedAddr, Path dataDir) {
+        // Set address as the only seed node.
         final Set<NodeAddress> allSeedAddrs = new HashSet<>(1);
         allSeedAddrs.add(seedAddr);
         testLog("ADDRESS %s", seedAddr);
 
         // Create a single seed node.
-        final Path dataDir = Paths.get(System.getProperty("user.dir"), dataDirName);
         final SeedNode seedNode = new SeedNode(dataDir.toString());
 
         // TODO: Check if setting a security provider is needed.
@@ -54,7 +59,7 @@ public class SeedNodeApp extends TestbedNodeApp {
             seedNode.createAndStartP2PService(
                     seedAddr, SeedNode.MAX_CONNECTIONS_DEFAULT,
                     seedAddr.hostName.equals("localhost"), REGTEST_NETWORK_ID,
-                    false /*detailed logging*/, allSeedAddrs, new TestbedListener());
+                    false /*detailed logging*/, allSeedAddrs, new SeedNodeListener(this));
         });
         // Automatically wait for the non-daemon user thread.
     }
@@ -86,5 +91,23 @@ public class SeedNodeApp extends TestbedNodeApp {
         }
 
         return new NodeAddress(hostName, port);
+    }
+
+    void start() {
+        UserThread.runPeriodically(() -> testLog("XXXX BROADCAST_PK"), 10, TimeUnit.SECONDS);
+    }
+}
+
+class SeedNodeListener extends TestbedListener {
+    private SeedNodeApp seedNodeApp;
+
+    SeedNodeListener(SeedNodeApp seedNodeApp) {
+        this.seedNodeApp = seedNodeApp;
+    }
+
+    @Override
+    public void onHiddenServicePublished() {
+        super.onHiddenServicePublished();
+        seedNodeApp.start();
     }
 }
