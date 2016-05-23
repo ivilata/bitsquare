@@ -32,7 +32,21 @@ public class SeedNodeApp extends TestbedNodeApp implements Runnable {
     public static void main(String[] args) {
         final NodeAddress seedAddr = newSeedNodeAddress((args.length > 0) ? args[0] : null);
         final Path dataDir = Paths.get(System.getProperty("user.dir"), dataDirName);
-        new SeedNodeApp(seedAddr, dataDir).run();
+        final SeedNodeApp app = new SeedNodeApp(seedAddr, dataDir);
+
+        // TODO: Check if setting a security provider is needed.
+
+        // Set the user thread as an independent non-daemon thread,
+        // and give it a name and a exception handler to print errors.
+        final ThreadFactory threadFactory = new ThreadFactoryBuilder()
+                .setNameFormat("SeedNode")
+                .setUncaughtExceptionHandler((thread, throwable) -> {
+                    throwable.printStackTrace();
+                    testLog("EXC %s: %s", throwable.getClass().getSimpleName(), throwable.getMessage());
+                })
+                .build();
+        UserThread.setExecutor(Executors.newSingleThreadExecutor(threadFactory));
+        app.run();
     }
 
     /** Get a seed node address based on the given string address.
@@ -74,23 +88,11 @@ public class SeedNodeApp extends TestbedNodeApp implements Runnable {
 
     @Override
     public void run() {
-        // TODO: Check if setting a security provider is needed.
-
         // Set address as the only seed node.
         final Set<NodeAddress> allSeedAddrs = new HashSet<>(1);
         allSeedAddrs.add(seedNodeAddress);
         testLog("ADDRESS %s", seedNodeAddress);
 
-        // Set the user thread as an independent non-daemon thread,
-        // and give it a name and a exception handler to print errors.
-        final ThreadFactory threadFactory = new ThreadFactoryBuilder()
-                .setNameFormat("SeedNode")
-                .setUncaughtExceptionHandler((thread, throwable) -> {
-                    throwable.printStackTrace();
-                    testLog("EXC %s: %s", throwable.getClass().getSimpleName(), throwable.getMessage());
-                })
-                .build();
-        UserThread.setExecutor(Executors.newSingleThreadExecutor(threadFactory));
         // Run seed node code in the user thread.
         UserThread.execute(() -> {
             testLog("START");
