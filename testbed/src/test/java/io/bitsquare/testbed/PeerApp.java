@@ -35,11 +35,15 @@ public class PeerApp extends TestbedNodeApp {
         }
         final NodeAddress seedAddr = new NodeAddress(args[0]);
 
-        // Set a security provider to allow key generation.
-        Security.addProvider(new BouncyCastleProvider());
-
         initEnvironment("Peer");
         new PeerApp(seedAddr);
+    }
+
+    static void initEnvironment(String userThreadName) {
+        TestbedNodeApp.initEnvironment(userThreadName);
+
+        // Set a security provider to allow key generation.
+        Security.addProvider(new BouncyCastleProvider());
     }
 
     private PeerApp(NodeAddress seedAddr) {
