@@ -26,7 +26,7 @@ import java.util.Set;
  * You must provide an argument with
  * the {@code HOSTNAME:PORT} address of the seed node.
  */
-public class PeerApp extends TestbedNodeApp {
+public class PeerApp extends TestbedNodeApp implements Runnable {
     public static void main(String[] args) {
         // Build a seed node repository containing only the one given as an argument.
         if (args.length < 1) {
@@ -36,7 +36,7 @@ public class PeerApp extends TestbedNodeApp {
         final NodeAddress seedAddr = new NodeAddress(args[0]);
 
         initEnvironment("Peer");
-        new PeerApp(seedAddr);
+        new PeerApp(seedAddr).run();
     }
 
     static void initEnvironment(String userThreadName) {
@@ -45,6 +45,8 @@ public class PeerApp extends TestbedNodeApp {
         // Set a security provider to allow key generation.
         Security.addProvider(new BouncyCastleProvider());
     }
+
+    private P2PService peer;
 
     private PeerApp(NodeAddress seedAddr) {
         final boolean useLocalhost = seedAddr.hostName.equals("localhost");
@@ -73,9 +75,12 @@ public class PeerApp extends TestbedNodeApp {
         final EncryptionService peerEncryptionService = new EncryptionService(peerKeyRing);
 
         // Create a new peer.
-        final P2PService peer = new P2PService(allSeedNodes, peerPort, peerTorDir, useLocalhost,
+        peer = new P2PService(allSeedNodes, peerPort, peerTorDir, useLocalhost,
                 REGTEST_NETWORK_ID, peerStorageDir, new Clock(), peerEncryptionService, peerKeyRing);
+    }
 
+    @Override
+    public void run() {
         // Run peer code in the user thread.
         UserThread.execute(() -> {
             testLog("START");
