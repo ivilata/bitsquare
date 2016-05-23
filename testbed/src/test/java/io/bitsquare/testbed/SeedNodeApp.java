@@ -30,8 +30,6 @@ public class SeedNodeApp extends TestbedNodeApp implements Runnable {
         final NodeAddress seedAddr = newSeedNodeAddress((args.length > 0) ? args[0] : null);
         final Path dataDir = Paths.get(System.getProperty("user.dir"), dataDirName);
 
-        // TODO: Check if setting a security provider is needed.
-
         initEnvironment("SeedNode");
         new SeedNodeApp(seedAddr, dataDir).run();
     }

@@ -9,11 +9,9 @@ import io.bitsquare.p2p.NodeAddress;
 import io.bitsquare.p2p.P2PService;
 import io.bitsquare.p2p.Utils;
 import io.bitsquare.p2p.seed.SeedNodesRepository;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 import java.io.File;
 import java.nio.file.Paths;
-import java.security.Security;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -36,13 +34,6 @@ public class PeerApp extends TestbedNodeApp implements Runnable {
 
         initEnvironment("Peer");
         new PeerApp(seedAddr).run();
-    }
-
-    static void initEnvironment(String userThreadName) {
-        TestbedNodeApp.initEnvironment(userThreadName);
-
-        // Set a security provider to allow key generation.
-        Security.addProvider(new BouncyCastleProvider());
     }
 
     P2PService peer;

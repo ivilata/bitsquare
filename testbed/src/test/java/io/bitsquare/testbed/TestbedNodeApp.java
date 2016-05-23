@@ -3,7 +3,9 @@ package io.bitsquare.testbed;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import io.bitsquare.common.UserThread;
 import io.bitsquare.p2p.P2PServiceListener;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
+import java.security.Security;
 import java.time.Instant;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
@@ -16,6 +18,9 @@ abstract class TestbedNodeApp {
 
     /** Initialize Bitsquare environment for execution. */
     static void initEnvironment(String userThreadName) {
+        // Set a security provider to allow key generation and reading keyrings.
+        Security.addProvider(new BouncyCastleProvider());
+
         // Set the user thread as an independent non-daemon thread,
         // and give it a name and a exception handler to print errors.
         final ThreadFactory threadFactory = new ThreadFactoryBuilder()
