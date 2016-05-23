@@ -37,6 +37,24 @@ public class PeerApp extends TestbedNodeApp {
             System.exit(1);
         }
         final NodeAddress seedAddr = new NodeAddress(args[0]);
+
+        // Set a security provider to allow key generation.
+        Security.addProvider(new BouncyCastleProvider());
+
+        // Set the user thread as an independent non-daemon thread,
+        // and give it a name and a exception handler to print errors.
+        final ThreadFactory threadFactory = new ThreadFactoryBuilder()
+                .setNameFormat("Peer")
+                .setUncaughtExceptionHandler((thread, throwable) -> {
+                    throwable.printStackTrace();
+                    testLog("EXC %s: %s", throwable.getClass().getSimpleName(), throwable.getMessage());
+                })
+                .build();
+        UserThread.setExecutor(Executors.newSingleThreadExecutor(threadFactory));
+        new PeerApp(seedAddr);
+    }
+
+    private PeerApp(NodeAddress seedAddr) {
         final boolean useLocalhost = seedAddr.hostName.equals("localhost");
         final Set<NodeAddress> allSeedAddrs = new HashSet<>(1);
         allSeedAddrs.add(seedAddr);
@@ -57,8 +75,7 @@ public class PeerApp extends TestbedNodeApp {
         //noinspection ResultOfMethodCallIgnored
         peerKeysDir.mkdirs();  // needed for creating the key ring
 
-        // Set a security provider to allow key generation, and create peer keys.
-        Security.addProvider(new BouncyCastleProvider());
+        // Create peer keys.
         final KeyStorage peerKeyStorage = new KeyStorage(peerKeysDir);
         final KeyRing peerKeyRing = new KeyRing(peerKeyStorage);
         final EncryptionService peerEncryptionService = new EncryptionService(peerKeyRing);
@@ -67,16 +84,6 @@ public class PeerApp extends TestbedNodeApp {
         final P2PService peer = new P2PService(allSeedNodes, peerPort, peerTorDir, useLocalhost,
                 REGTEST_NETWORK_ID, peerStorageDir, new Clock(), peerEncryptionService, peerKeyRing);
 
-        // Set the user thread as an independent non-daemon thread,
-        // and give it a name and a exception handler to print errors.
-        final ThreadFactory threadFactory = new ThreadFactoryBuilder()
-                .setNameFormat("Peer")
-                .setUncaughtExceptionHandler((thread, throwable) -> {
-                    throwable.printStackTrace();
-                    testLog("EXC %s: %s", throwable.getClass().getSimpleName(), throwable.getMessage());
-                })
-                .build();
-        UserThread.setExecutor(Executors.newSingleThreadExecutor(threadFactory));
         // Run peer code in the user thread.
         UserThread.execute(() -> {
             testLog("START");
