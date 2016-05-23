@@ -65,11 +65,11 @@ public class SeedNodeApp extends TestbedNodeApp implements Runnable {
         return new NodeAddress(hostName, port);
     }
 
-    private NodeAddress seedAddr;
+    private NodeAddress seedNodeAddress;
     private SeedNode seedNode;
 
-    private SeedNodeApp(NodeAddress seedAddr, Path dataDir) {
-        this.seedAddr = seedAddr;
+    private SeedNodeApp(NodeAddress seedNodeAddress, Path dataDir) {
+        this.seedNodeAddress = seedNodeAddress;
         this.seedNode = new SeedNode(dataDir.toString());
     }
 
@@ -79,8 +79,8 @@ public class SeedNodeApp extends TestbedNodeApp implements Runnable {
 
         // Set address as the only seed node.
         final Set<NodeAddress> allSeedAddrs = new HashSet<>(1);
-        allSeedAddrs.add(seedAddr);
-        testLog("ADDRESS %s", seedAddr);
+        allSeedAddrs.add(seedNodeAddress);
+        testLog("ADDRESS %s", seedNodeAddress);
 
         // Set the user thread as an independent non-daemon thread,
         // and give it a name and a exception handler to print errors.
@@ -96,8 +96,8 @@ public class SeedNodeApp extends TestbedNodeApp implements Runnable {
         UserThread.execute(() -> {
             testLog("START");
             seedNode.createAndStartP2PService(
-                    seedAddr, SeedNode.MAX_CONNECTIONS_DEFAULT,
-                    seedAddr.hostName.equals("localhost"), REGTEST_NETWORK_ID,
+                    seedNodeAddress, SeedNode.MAX_CONNECTIONS_DEFAULT,
+                    seedNodeAddress.hostName.equals("localhost"), REGTEST_NETWORK_ID,
                     false /*detailed logging*/, allSeedAddrs, new SeedNodeListener(this));
         });
         // Automatically wait for the non-daemon user thread.
