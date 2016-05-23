@@ -13,7 +13,6 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Single seed node application for testbed experiments.
@@ -98,26 +97,8 @@ public class SeedNodeApp extends TestbedNodeApp implements Runnable {
             seedNode.createAndStartP2PService(
                     seedNodeAddress, SeedNode.MAX_CONNECTIONS_DEFAULT,
                     seedNodeAddress.hostName.equals("localhost"), REGTEST_NETWORK_ID,
-                    false /*detailed logging*/, allSeedAddrs, new SeedNodeListener(this));
+                    false /*detailed logging*/, allSeedAddrs, new TestbedListener());
         });
         // Automatically wait for the non-daemon user thread.
-    }
-
-    void start() {
-        UserThread.runPeriodically(() -> testLog("XXXX BROADCAST_PK"), 10, TimeUnit.SECONDS);
-    }
-}
-
-class SeedNodeListener extends TestbedListener {
-    private SeedNodeApp seedNodeApp;
-
-    SeedNodeListener(SeedNodeApp seedNodeApp) {
-        this.seedNodeApp = seedNodeApp;
-    }
-
-    @Override
-    public void onHiddenServicePublished() {
-        super.onHiddenServicePublished();
-        seedNodeApp.start();
     }
 }
