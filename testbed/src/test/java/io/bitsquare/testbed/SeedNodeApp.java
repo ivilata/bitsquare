@@ -86,7 +86,7 @@ public class SeedNodeApp extends TestbedNodeApp implements Runnable {
             seedNode.createAndStartP2PService(
                     seedNodeAddress, SeedNode.MAX_CONNECTIONS_DEFAULT,
                     seedNodeAddress.hostName.equals("localhost"), REGTEST_NETWORK_ID,
-                    false /*detailed logging*/, allSeedAddrs, new TestbedListener());
+                    false /*detailed logging*/, allSeedAddrs, newTestbedListener());
         });
         // Automatically wait for the non-daemon user thread.
     }

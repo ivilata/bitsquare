@@ -28,7 +28,6 @@ import java.util.Set;
  */
 public class PeerApp extends TestbedNodeApp implements Runnable {
     public static void main(String[] args) {
-        // Build a seed node repository containing only the one given as an argument.
         if (args.length < 1) {
             System.err.println("missing HOSTNAME:PORT address of seed node");
             System.exit(1);
@@ -46,9 +45,10 @@ public class PeerApp extends TestbedNodeApp implements Runnable {
         Security.addProvider(new BouncyCastleProvider());
     }
 
-    private P2PService peer;
+    P2PService peer;
 
-    private PeerApp(NodeAddress seedAddr) {
+    PeerApp(NodeAddress seedAddr) {
+        // Build a seed node repository containing only the one given as an argument.
         final boolean useLocalhost = seedAddr.hostName.equals("localhost");
         final Set<NodeAddress> allSeedAddrs = new HashSet<>(1);
         allSeedAddrs.add(seedAddr);
@@ -84,7 +84,7 @@ public class PeerApp extends TestbedNodeApp implements Runnable {
         // Run peer code in the user thread.
         UserThread.execute(() -> {
             testLog("START");
-            peer.start(new TestbedListener());
+            peer.start(newTestbedListener());
         });
         // Automatically wait for the non-daemon user thread.
     }

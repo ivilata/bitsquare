@@ -45,6 +45,11 @@ abstract class TestbedNodeApp {
                 )
         );
     }
+
+    /** Get a new P2P service listener for this application. */
+    P2PServiceListener newTestbedListener() {
+        return new TestbedListener();
+    }
 }
 
 /** A P2P service listener that logs interesting events. */
