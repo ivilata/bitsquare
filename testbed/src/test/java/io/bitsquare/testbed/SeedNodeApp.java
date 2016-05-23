@@ -25,11 +25,11 @@ import java.util.concurrent.TimeUnit;
  * a {@code HOSTNAME[:PORT]} address to listen on.
  * Otherwise an automatic local host address will be chosen for you.
  */
-public class SeedNodeApp extends TestbedNodeApp {
+public class SeedNodeApp extends TestbedNodeApp implements Runnable {
     public static void main(String[] args) {
         final NodeAddress seedAddr = newSeedNodeAddress((args.length > 0) ? args[0] : null);
         final Path dataDir = Paths.get(System.getProperty("user.dir"), dataDirName);
-        new SeedNodeApp(seedAddr, dataDir);
+        new SeedNodeApp(seedAddr, dataDir).run();
     }
 
     /** Get a seed node address based on the given string address.
@@ -61,16 +61,22 @@ public class SeedNodeApp extends TestbedNodeApp {
         return new NodeAddress(hostName, port);
     }
 
+    private NodeAddress seedAddr;
+    private SeedNode seedNode;
+
     private SeedNodeApp(NodeAddress seedAddr, Path dataDir) {
+        this.seedAddr = seedAddr;
+        this.seedNode = new SeedNode(dataDir.toString());
+    }
+
+    @Override
+    public void run() {
+        // TODO: Check if setting a security provider is needed.
+
         // Set address as the only seed node.
         final Set<NodeAddress> allSeedAddrs = new HashSet<>(1);
         allSeedAddrs.add(seedAddr);
         testLog("ADDRESS %s", seedAddr);
-
-        // Create a single seed node.
-        final SeedNode seedNode = new SeedNode(dataDir.toString());
-
-        // TODO: Check if setting a security provider is needed.
 
         // Set the user thread as an independent non-daemon thread,
         // and give it a name and a exception handler to print errors.
