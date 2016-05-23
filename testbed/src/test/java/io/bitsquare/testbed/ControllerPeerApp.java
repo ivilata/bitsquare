@@ -2,11 +2,9 @@ package io.bitsquare.testbed;
 
 import io.bitsquare.common.UserThread;
 import io.bitsquare.common.crypto.KeyRing;
-import io.bitsquare.common.crypto.PubKeyRing;
 import io.bitsquare.p2p.NodeAddress;
 import io.bitsquare.p2p.P2PServiceListener;
 import io.bitsquare.p2p.peers.Broadcaster;
-import io.bitsquare.p2p.storage.messages.BroadcastMessage;
 
 import java.util.concurrent.TimeUnit;
 
@@ -53,8 +51,9 @@ public class ControllerPeerApp extends PeerApp {
     private void broadcastHello() {
         final KeyRing keyRing = peer.getKeyRing();
         checkState(keyRing != null, "keyring missing in already bootstrapped node");
+        testLog("XXXX SEND_HELLO");
         broadcaster.broadcast(
-                new SeedNodeHelloMessage(keyRing.getPubKeyRing()),
+                new ControllerPeerHelloMessage(keyRing.getPubKeyRing()),
                 peer.getAddress(), null, true);
      }
 
@@ -75,14 +74,5 @@ class ControllerPeerListener extends TestbedListener {
     public void onHiddenServicePublished() {
         super.onHiddenServicePublished();
         controllerPeerApp.start();
-    }
-}
-
-class SeedNodeHelloMessage extends BroadcastMessage {
-    public final long localTimeMillis = System.currentTimeMillis();
-    public PubKeyRing pubKeyRing;
-
-    SeedNodeHelloMessage(PubKeyRing pubKeyRing) {
-        this.pubKeyRing = pubKeyRing;
     }
 }

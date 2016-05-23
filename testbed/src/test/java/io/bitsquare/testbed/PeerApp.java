@@ -4,10 +4,13 @@ import io.bitsquare.common.Clock;
 import io.bitsquare.common.UserThread;
 import io.bitsquare.common.crypto.KeyRing;
 import io.bitsquare.common.crypto.KeyStorage;
+import io.bitsquare.crypto.DecryptedMsgWithPubKey;
 import io.bitsquare.crypto.EncryptionService;
 import io.bitsquare.p2p.NodeAddress;
 import io.bitsquare.p2p.P2PService;
 import io.bitsquare.p2p.Utils;
+import io.bitsquare.p2p.messaging.DecryptedDirectMessageListener;
+import io.bitsquare.p2p.messaging.DecryptedMailboxListener;
 import io.bitsquare.p2p.seed.SeedNodesRepository;
 
 import java.io.File;
@@ -68,6 +71,15 @@ public class PeerApp extends TestbedNodeApp implements Runnable {
         // Create a new peer.
         peer = new P2PService(allSeedNodes, peerPort, peerTorDir, useLocalhost,
                 REGTEST_NETWORK_ID, peerStorageDir, new Clock(), peerEncryptionService, peerKeyRing);
+        // TODO: None working for receiving broadcasts.
+        peer.addDecryptedDirectMessageListener((decryptedMsgWithPubKey, peerNodeAddress) -> {
+            if (decryptedMsgWithPubKey.message instanceof ControllerPeerHelloMessage)
+                testLog("XXXX RECV_HELLO");
+        });
+        peer.addDecryptedMailboxListener((decryptedMsgWithPubKey, senderNodeAddress) -> {
+            if (decryptedMsgWithPubKey.message instanceof ControllerPeerHelloMessage)
+                testLog("XXXX RECV_HELLO");
+        });
     }
 
     @Override
