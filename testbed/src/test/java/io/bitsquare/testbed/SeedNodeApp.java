@@ -32,6 +32,35 @@ public class SeedNodeApp extends TestbedNodeApp {
         new SeedNodeApp(seedAddr, dataDir);
     }
 
+    /** Get a seed node address based on the given string address.
+     *
+     * The given address has the format {@code HOSTNAME[:PORT]}.
+     * If the whole address or any components are missing they are chosen automatically,
+     * defaulting to local host addresses.
+     */
+    private static NodeAddress newSeedNodeAddress(@Nullable String addr) {
+        String hostName = "localhost";
+        int port = 0;  // choose automatically
+
+        if (addr != null) {  // host name or port given as arguments
+            String[] hnp = addr.split(":", 2);
+            if (hnp[0].length() > 0)
+                hostName = hnp[0];
+            if (hnp.length > 1)
+                port = Integer.parseInt(hnp[1]);
+        }
+
+        if (port == 0) {  // missing port, choose automatically
+            // The address is only considered by ``SeedNodesRepository`` if
+            // its port ends in the digit matching the network identifier.
+            do {
+                port = Utils.findFreeSystemPort();
+            } while (port % 10 != REGTEST_NETWORK_ID);
+        }
+
+        return new NodeAddress(hostName, port);
+    }
+
     private SeedNodeApp(NodeAddress seedAddr, Path dataDir) {
         // Set address as the only seed node.
         final Set<NodeAddress> allSeedAddrs = new HashSet<>(1);
@@ -62,35 +91,6 @@ public class SeedNodeApp extends TestbedNodeApp {
                     false /*detailed logging*/, allSeedAddrs, new SeedNodeListener(this));
         });
         // Automatically wait for the non-daemon user thread.
-    }
-
-    /** Get a seed node address based on the given string address.
-     *
-     * The given address has the format {@code HOSTNAME[:PORT]}.
-     * If the whole address or any components are missing they are chosen automatically,
-     * defaulting to local host addresses.
-     */
-    private static NodeAddress newSeedNodeAddress(@Nullable String addr) {
-        String hostName = "localhost";
-        int port = 0;  // choose automatically
-
-        if (addr != null) {  // host name or port given as arguments
-            String[] hnp = addr.split(":", 2);
-            if (hnp[0].length() > 0)
-                hostName = hnp[0];
-            if (hnp.length > 1)
-                port = Integer.parseInt(hnp[1]);
-        }
-
-        if (port == 0) {  // missing port, choose automatically
-            // The address is only considered by ``SeedNodesRepository`` if
-            // its port ends in the digit matching the network identifier.
-            do {
-                port = Utils.findFreeSystemPort();
-            } while (port % 10 != REGTEST_NETWORK_ID);
-        }
-
-        return new NodeAddress(hostName, port);
     }
 
     void start() {
