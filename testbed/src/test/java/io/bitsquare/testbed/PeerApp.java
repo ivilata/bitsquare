@@ -38,6 +38,7 @@ public class PeerApp extends TestbedNodeApp implements Runnable {
     }
 
     P2PService peer;
+    private NodeAddress controllerPeerNodeAddress;
     private PubKeyRing controllerPeerPubKeyRing;
 
     PeerApp(NodeAddress seedAddr) {
@@ -71,8 +72,10 @@ public class PeerApp extends TestbedNodeApp implements Runnable {
         peer = new P2PService(allSeedNodes, peerPort, peerTorDir, useLocalhost,
                 REGTEST_NETWORK_ID, peerStorageDir, new Clock(), peerEncryptionService, peerKeyRing);
         peer.getNetworkNode().addMessageListener((message, connection) -> {
-            if (message instanceof ControllerPeerHelloMessage)
+            if (message instanceof ControllerPeerHelloMessage) {
+                controllerPeerNodeAddress = ((ControllerPeerHelloMessage) message).nodeAddress;
                 controllerPeerPubKeyRing = ((ControllerPeerHelloMessage) message).pubKeyRing;
+            }
         });
     }
 

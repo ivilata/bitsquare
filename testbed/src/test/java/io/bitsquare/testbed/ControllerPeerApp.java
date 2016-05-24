@@ -53,7 +53,7 @@ public class ControllerPeerApp extends PeerApp {
         checkState(keyRing != null, "keyring missing in already bootstrapped node");
         testLog("XXXX SEND_HELLO");
         broadcaster.broadcast(
-                new ControllerPeerHelloMessage(keyRing.getPubKeyRing()),
+                new ControllerPeerHelloMessage(peer.getNetworkNode().getNodeAddress(), keyRing.getPubKeyRing()),
                 peer.getAddress(), null, true);
      }
 
