@@ -25,7 +25,7 @@ import java.util.Set;
  * You must provide an argument with
  * the {@code HOSTNAME:PORT} address of the seed node.
  */
-public class PeerApp extends TestbedNodeApp implements Runnable {
+public class PeerApp extends TestbedNodeApp {
     public static void main(String[] args) {
         if (args.length < 1) {
             System.err.println("missing HOSTNAME:PORT address of seed node");

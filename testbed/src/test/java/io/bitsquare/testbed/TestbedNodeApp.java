@@ -10,7 +10,7 @@ import java.time.Instant;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 
-abstract class TestbedNodeApp {
+abstract class TestbedNodeApp implements Runnable {
     /** Name of directory under the current one to place data files into. */
     static final String dataDirName = "testbed-data";
     /** Numeric identifier of the regtest Bitcoin network. */
@@ -55,6 +55,8 @@ abstract class TestbedNodeApp {
     P2PServiceListener newTestbedListener() {
         return new TestbedListener();
     }
+
+    public abstract void run();
 }
 
 /** A P2P service listener that logs interesting events. */

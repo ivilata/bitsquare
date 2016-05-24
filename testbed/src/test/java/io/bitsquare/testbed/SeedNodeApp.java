@@ -21,7 +21,7 @@ import java.util.Set;
  * a {@code HOSTNAME[:PORT]} address to listen on.
  * Otherwise an automatic local host address will be chosen for you.
  */
-public class SeedNodeApp extends TestbedNodeApp implements Runnable {
+public class SeedNodeApp extends TestbedNodeApp {
     /** Create and run a seed node on the given address.
      *
      * Data is stored in a directory under the current one.
